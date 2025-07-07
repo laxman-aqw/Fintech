@@ -38,5 +38,16 @@ namespace FinTech.Controllers
             return Ok(stock.ToStockDto());
         }
 
+        [HttpPost]
+        public async Task<ActionResult<StockDto>> AddStock([FromBody] CreateStockDto stockDto) {
+            var stockModel = stockDto.ToStockFromAddDto();
+            _context.Stocks.Add(stockModel);
+          await   _context.SaveChangesAsync();
+
+            var stockDtoResult = stockModel.ToStockDto();
+
+            return CreatedAtAction(nameof(GetStockById), new {id=stockModel.Id}, stockDtoResult);
+        }
+
     }
 }
