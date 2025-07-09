@@ -1,4 +1,6 @@
 using FinTech.Data;
+using FinTech.Interfaces;
+using FinTech.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,9 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 
 }
 );
+
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

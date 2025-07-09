@@ -1,5 +1,6 @@
 ﻿using FinTech.Data;
 using FinTech.Dtos.Stock;
+using FinTech.Interfaces;
 using FinTech.Mappers;
 using FinTech.Models;
 using Microsoft.AspNetCore.Http;
@@ -14,15 +15,17 @@ namespace FinTech.Controllers
     public class StockController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
-        public StockController(ApplicationDBContext context)
+        private readonly IStockRepository _stockRepo;
+        public StockController(ApplicationDBContext context, IStockRepository stockRepo)
         {
+            _stockRepo = stockRepo;
             _context = context;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<StockDto>>> GetStocks()
         {
-            var stocks = (await _context.Stocks.ToListAsync()).Select(s=>s.ToStockDto()).ToList();
+            var stocks = (await _stockRepo.GetAllAsync()).Select(s=>s.ToStockDto()).ToList();
             if(stocks.Count==0)
             {
                 return NotFound( new { message="No stocks found.", success=false });
@@ -73,7 +76,7 @@ namespace FinTech.Controllers
             if (stock == null) {
                 return NotFound();
             }
-            _context.Stocks.Remove(stock);
+            await _context.Stocks.Remove(stock);
             await _context.SaveChangesAsync();
             return NoContent();
         }
