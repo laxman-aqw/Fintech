@@ -1,4 +1,5 @@
 ﻿using FinTech.Data;
+using FinTech.Dtos.Comment;
 using FinTech.Interfaces;
 using FinTech.Mappers;
 using FinTech.Models;
@@ -25,6 +26,17 @@ namespace FinTech.Controllers
                 return NotFound(new { message = "No comments found.", success = false });
             }
             return Ok(comments);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CommentDto>> GetCommentById(int id)
+        {
+            var comment = await _commentRepo.GetByIdAsync(id);
+            if (comment == null)
+            {
+                return NotFound(new { message = "Comment not found.", success = false });
+            }
+            return Ok(comment.ToCommentDto());
         }
     }
 }
