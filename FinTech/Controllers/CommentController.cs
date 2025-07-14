@@ -23,7 +23,7 @@ namespace FinTech.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Comment>>> GetComments() {
             var comments = (await _commentRepo.GetAllAsync()).Select(s => s.ToCommentDto()).ToList();
-            if(comments.Count == 0)
+            if (comments.Count == 0)
             {
                 return NotFound(new { message = "No comments found.", success = false });
             }
@@ -43,7 +43,7 @@ namespace FinTech.Controllers
 
         [HttpPost("{stockId}")]
         public async Task<ActionResult> CreateComment(int stockId, CreateCommentDto commentDto) {
-            if(!await _stockRepo.StockExist(stockId))
+            if (!await _stockRepo.StockExist(stockId))
             {
                 return BadRequest("Stock doest not exist");
             }
@@ -51,5 +51,17 @@ namespace FinTech.Controllers
             await _commentRepo.CreateAsync(comment);
             return CreatedAtAction(nameof(GetCommentById), new { id = comment.Id }, comment.ToCommentDto());
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteComment(int id) {
+            var comment = await _commentRepo.DeleteComment(id);
+            if (comment == null)
+            {
+                return NotFound(new { message = "Comment not found.", success = false });
+            }
+            return NoContent();
+
+        }
+
     }
 }
