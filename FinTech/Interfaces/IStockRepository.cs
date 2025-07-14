@@ -10,5 +10,6 @@ namespace FinTech.Interfaces
         Task<Stock> CreateAsync(Stock stock);
         Task<Stock?> DeleteAsync(int id);
         Task<Stock?> UpdateAsync(int id, UpdateStockDto stockDto);
+        Task<bool> StockExist(int id);
     }
 }

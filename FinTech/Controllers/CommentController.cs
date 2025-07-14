@@ -12,9 +12,11 @@ namespace FinTech.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
+        private readonly IStockRepository _stockRepo;
         private readonly ICommentRepository _commentRepo;
-        public CommentController(ICommentRepository commentRepo)
+        public CommentController(ICommentRepository commentRepo, IStockRepository stockRepo)
         {
+            _stockRepo = stockRepo;
             _commentRepo = commentRepo;
         }
 
@@ -37,6 +39,17 @@ namespace FinTech.Controllers
                 return NotFound(new { message = "Comment not found.", success = false });
             }
             return Ok(comment.ToCommentDto());
+        }
+
+        [HttpPost("{stockId}")]
+        public async Task<ActionResult> CreateComment(int stockId, CreateCommentDto commentDto) {
+            if(!await _stockRepo.StockExist(stockId))
+            {
+                return BadRequest("Stock doest not exist");
+            }
+            var comment = commentDto.ToCommentFromCreate(stockId);
+            await _commentRepo.CreateAsync(comment);
+            return CreatedAtAction(nameof(GetCommentById), new { id = comment.Id }, comment.ToCommentDto());
         }
     }
 }
