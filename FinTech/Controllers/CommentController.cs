@@ -22,6 +22,8 @@ namespace FinTech.Controllers
 
         [HttpGet]
         public async Task<ActionResult<List<Comment>>> GetComments() {
+
+           
             var comments = (await _commentRepo.GetAllAsync()).Select(s => s.ToCommentDto()).ToList();
             if (comments.Count == 0)
             {
@@ -30,9 +32,10 @@ namespace FinTech.Controllers
             return Ok(comments);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<CommentDto>> GetCommentById(int id)
         {
+          
             var comment = await _commentRepo.GetByIdAsync(id);
             if (comment == null)
             {
@@ -41,8 +44,12 @@ namespace FinTech.Controllers
             return Ok(comment.ToCommentDto());
         }
 
-        [HttpPost("{stockId}")]
+        [HttpPost("{stockId:int}")]
         public async Task<ActionResult> CreateComment(int stockId, CreateCommentDto commentDto) {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             if (!await _stockRepo.StockExist(stockId))
             {
                 return BadRequest("Stock doest not exist");
@@ -52,8 +59,9 @@ namespace FinTech.Controllers
             return CreatedAtAction(nameof(GetCommentById), new { id = comment.Id }, comment.ToCommentDto());
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteComment(int id) {
+            
             var comment = await _commentRepo.DeleteComment(id);
             if (comment == null)
             {

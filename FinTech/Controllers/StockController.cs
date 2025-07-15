@@ -23,6 +23,7 @@ namespace FinTech.Controllers
         [HttpGet]
         public async Task<ActionResult<List<StockDto>>> GetStocks()
         {
+            
             var stocks = (await _stockRepo.GetAllAsync()).Select(s=>s.ToStockDto()).ToList();
             if(stocks.Count==0)
             {
@@ -31,8 +32,9 @@ namespace FinTech.Controllers
             return Ok(stocks);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<StockDto>> GetStockById(int id) {
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<StockDto>> GetStockById( int id) {
+            
             var stock = await _stockRepo.GetByIdAsync(id);
             if (stock == null) { 
                 return NotFound(new { message = "Stock not found with current id.", success = false });
@@ -42,6 +44,10 @@ namespace FinTech.Controllers
 
         [HttpPost]
         public async Task<ActionResult<StockDto>> AddStock([FromBody] CreateStockDto createStockDto) {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var stockModel = createStockDto.ToStockFromAddDto();
 
             var stock = await _stockRepo.CreateAsync(stockModel);
@@ -50,8 +56,12 @@ namespace FinTech.Controllers
             return CreatedAtAction(nameof(GetStockById), new {id=stock.Id}, stockDtoResult);
         }
 
-        [HttpPut("{Id}")]
+        [HttpPut("{Id:int}")]
         public async Task<ActionResult<StockDto>> UpdateStock(int Id, [FromBody] UpdateStockDto  updateStockDto) {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var stockModel = await _stockRepo.UpdateAsync(Id, updateStockDto);
             if (stockModel == null) {
                 return NotFound(new { message = "Stock not found" });
@@ -60,7 +70,7 @@ namespace FinTech.Controllers
             return Ok(stockModel.ToStockDto());
         }
 
-        [HttpDelete("{Id}")]
+        [HttpDelete("{Id:int}")]
         public async Task<ActionResult<Stock>> DeleteStock(int Id) {
             var stock = await _stockRepo.DeleteAsync(Id);
             if (stock == null) {
