@@ -1,5 +1,6 @@
 ﻿using FinTech.Data;
 using FinTech.Dtos.Stock;
+using FinTech.Helpers;
 using FinTech.Interfaces;
 using FinTech.Mappers;
 using FinTech.Models;
@@ -21,10 +22,13 @@ namespace FinTech.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<StockDto>>> GetStocks()
+        public async Task<ActionResult<List<StockDto>>> GetStocks([FromQuery] QueryObject query)
         {
-            
-            var stocks = (await _stockRepo.GetAllAsync()).Select(s=>s.ToStockDto()).ToList();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var stocks = (await _stockRepo.GetAllAsync(query)).Select(s=>s.ToStockDto()).ToList();
             if(stocks.Count==0)
             {
                 return NotFound( new { message="No stocks found.", success=false });

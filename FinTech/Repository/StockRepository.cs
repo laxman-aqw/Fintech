@@ -1,5 +1,6 @@
 ﻿using FinTech.Data;
 using FinTech.Dtos.Stock;
+using FinTech.Helpers;
 using FinTech.Interfaces;
 using FinTech.Models;
 using Microsoft.EntityFrameworkCore;
@@ -13,9 +14,20 @@ namespace FinTech.Repository
         {
             _context = context;
         }
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            return await _context.Stocks.Include(c => c.Comments).ToListAsync();
+            var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(s=>s.Symbol.Contains(query.Symbol));
+            }
+            return await stocks.ToListAsync();
         }
 
         public async Task<Stock> CreateAsync(Stock stock)
