@@ -1,4 +1,5 @@
 ﻿using FinTech.Data;
+using FinTech.Dtos.Comment;
 using FinTech.Interfaces;
 using FinTech.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -43,6 +44,19 @@ namespace FinTech.Repository
         {
             return await _context.Comments.FindAsync(id);
 
+        }
+
+        public async Task<Comment?> UpdateComment(int id, UpdateCommentDto updateCommentDto)
+        {
+            var comment = await _context.Comments.FindAsync(id);
+            if (comment == null)
+            {
+                return null;
+            }
+            comment.Title = updateCommentDto.Title;
+            comment.Content = updateCommentDto.Content;
+            await _context.SaveChangesAsync();
+            return comment;
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using FinTech.Models;
+﻿using FinTech.Dtos.Comment;
+using FinTech.Models;
 using System.Net;
 
 namespace FinTech.Interfaces
@@ -10,5 +11,6 @@ namespace FinTech.Interfaces
         Task<Comment> CreateAsync(Comment comment);
 
         Task<Comment?> DeleteComment(int id);
+        Task<Comment?> UpdateComment(int id, UpdateCommentDto updateCommentDto);
     }
 }

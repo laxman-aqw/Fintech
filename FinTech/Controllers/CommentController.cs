@@ -71,5 +71,15 @@ namespace FinTech.Controllers
 
         }
 
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> UpdateComment(int id, UpdateCommentDto updateCommentDto) {
+            var comment = await _commentRepo.UpdateComment(id, updateCommentDto);
+            if (comment == null)
+            {
+                return NotFound(new { message = "Comment not found.", success = false });
+            }
+            return Ok(comment.ToCommentDto());
+        }
+
     }
 }
